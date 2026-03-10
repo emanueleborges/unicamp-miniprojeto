@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SensorMonitor</string>
+    <string name="app_name">Sensor Monitor</string>
     <string name="app_title">Sensor Monitor</string>
     <string name="app_subtitle">Monitore sensores em tempo real</string>
 </resources>

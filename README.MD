@@ -338,6 +338,7 @@ Para filtrar no Logcat:
 ```
 tag:SensorMonitor
 ```
+## 📝 Tesde de Cobertura 
 
 <img src="testecobertura.png">
 

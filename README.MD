@@ -148,15 +148,15 @@ A ◀──▶ B  →  Relação bidirecional
                │
                ▼
 ┌──────────────────────────────┐
-│     SensorMonitorApp.kt     │  Ponto de entrada do Hilt (@HiltAndroidApp)
-│     Inicializa Dagger/Hilt  │──▶ AppModule.kt (provisão de dependências)
+│     SensorMonitorApp.kt      │  Ponto de entrada do Hilt (@HiltAndroidApp)
+│     Inicializa Dagger/Hilt   │──▶ AppModule.kt (provisão de dependências)
 └──────────────┬───────────────┘
                │
                ▼
 ┌──────────────────────────────┐
-│     MainActivity.kt         │  Única Activity do app (@AndroidEntryPoint)
-│     Configura Compose +     │──▶ MiniProjetoTheme (Theme.kt)
-│     edge-to-edge            │──▶ AppNavGraph.kt (define rotas)
+│     MainActivity.kt          │  Única Activity do app (@AndroidEntryPoint)
+│     Configura Compose +      │──▶ MiniProjetoTheme (Theme.kt)
+│     edge-to-edge             │──▶ AppNavGraph.kt (define rotas)
 └──────────────┬───────────────┘
                │
                ▼

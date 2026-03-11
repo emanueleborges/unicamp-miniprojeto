@@ -62,6 +62,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     }
 
     val jacocoExcludes = listOf(
+        // AndroidX / bibliotecas externas
+        "**/androidx/**",
         // Android generated
         "**/R.class", "**/R\$*.class",
         "**/BuildConfig.*",
@@ -99,7 +101,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/presentation/screen/accelerometer/AccelerometerViewModel*"
     )
 
-    val kotlinClasses = fileTree(layout.buildDirectory.dir("intermediates/classes/debug")) {
+    val kotlinClasses = fileTree(layout.buildDirectory.dir("intermediates/classes/debug/transformDebugClassesWithAsm/dirs")) {
         exclude(jacocoExcludes)
     }
 

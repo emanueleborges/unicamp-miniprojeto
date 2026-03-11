@@ -1,13 +1,17 @@
-package com.example.miniprojeto
+package com.example.miniprojeto.data.database
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.miniprojeto.data.model.SensorReading
 
 /**
  * Helper para gerenciar o banco de dados SQLite
  * que armazena as leituras dos sensores.
+ *
+ * Responsabilidade única: operações SQL de baixo nível.
+ * Para a camada de negócio, use [com.example.miniprojeto.data.repository.SensorRepository].
  */
 class SensorDatabaseHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -15,13 +19,13 @@ class SensorDatabaseHelper(context: Context) :
     companion object {
         private const val DATABASE_NAME = "sensor_data.db"
         private const val DATABASE_VERSION = 1
-        private const val TABLE_NAME = "readings"
-        private const val COL_ID = "id"
-        private const val COL_SENSOR_TYPE = "sensor_type"
-        private const val COL_VALUE_X = "value_x"
-        private const val COL_VALUE_Y = "value_y"
-        private const val COL_VALUE_Z = "value_z"
-        private const val COL_TIMESTAMP = "timestamp"
+        const val TABLE_NAME = "readings"
+        const val COL_ID = "id"
+        const val COL_SENSOR_TYPE = "sensor_type"
+        const val COL_VALUE_X = "value_x"
+        const val COL_VALUE_Y = "value_y"
+        const val COL_VALUE_Z = "value_z"
+        const val COL_TIMESTAMP = "timestamp"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -77,6 +81,11 @@ class SensorDatabaseHelper(context: Context) :
             }
         }
         return readings
+    }
+
+    /** Remove uma leitura específica pelo ID. */
+    fun deleteReadingById(id: Long): Int {
+        return writableDatabase.delete(TABLE_NAME, "$COL_ID = ?", arrayOf(id.toString()))
     }
 
     /** Remove todas as leituras do banco. */

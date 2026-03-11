@@ -1,15 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF1976D2</color>
-    <color name="colorPrimaryDark">#FF1565C0</color>
-    <color name="colorAccent">#FFFFAB00</color>
-    <color name="colorBackground">#FFF5F5F5</color>
-    <color name="colorText">#FF212121</color>
-    <color name="colorTextSecondary">#FF757575</color>
-    <color name="colorAccelerometer">#FF4CAF50</color>
-    <color name="colorLight">#FFFFAB00</color>
-    <color name="colorHistory">#FF9C27B0</color>
-    <color name="colorDanger">#FFF44336</color>
+    <!-- Dark Theme Base -->
+    <color name="colorBackground">#FF0D1117</color>
+    <color name="colorSurface">#FF161B22</color>
+    <color name="colorCard">#FF1C2333</color>
+    <color name="colorCardBorder">#FF2A3142</color>
+
+    <!-- Primary -->
+    <color name="colorPrimary">#FF3B82F6</color>
+    <color name="colorPrimaryDark">#FF1D4ED8</color>
+    <color name="colorAccent">#FF60A5FA</color>
+
+    <!-- Text -->
+    <color name="colorText">#FFFFFFFF</color>
+    <color name="colorTextSecondary">#FF8B949E</color>
+    <color name="colorTextMuted">#FF6B7280</color>
+
+    <!-- Sensor Colors -->
+    <color name="colorAccelerometer">#FF22C55E</color>
+    <color name="colorAccelerometerDark">#FF166534</color>
+    <color name="colorLight">#FFEAB308</color>
+    <color name="colorLightDark">#FF854D0E</color>
+    <color name="colorHistory">#FF8B5CF6</color>
+    <color name="colorHistoryDark">#FF5B21B6</color>
+
+    <!-- Status -->
+    <color name="colorDanger">#FFEF4444</color>
+    <color name="colorSuccess">#FF22C55E</color>
+    <color name="colorWarning">#FFF59E0B</color>
+
+    <!-- Misc -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorNavBar">#FF111827</color>
+    <color name="colorNavBarBorder">#FF1F2937</color>
+
+    <!-- Badge Colors -->
+    <color name="colorBadgeActive">#FF166534</color>
+    <color name="colorBadgeActiveText">#FF4ADE80</color>
+    <color name="colorBadgeStandby">#FF854D0E</color>
+    <color name="colorBadgeStandbyText">#FFFBBF24</color>
+    <color name="colorBadgeSqlite">#FF5B21B6</color>
+    <color name="colorBadgeSqliteText">#FFA78BFA</color>
+    <color name="colorBadgePrimary">#FF1E3A5F</color>
+    <color name="colorBadgePrimaryText">#FF60A5FA</color>
 </resources>

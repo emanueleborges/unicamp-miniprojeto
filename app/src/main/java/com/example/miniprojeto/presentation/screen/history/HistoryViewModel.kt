@@ -1,6 +1,7 @@
 package com.example.miniprojeto.presentation.screen.history
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.miniprojeto.domain.usecase.ClearAllReadingsUseCase
 import com.example.miniprojeto.domain.usecase.DeleteReadingUseCase
 import com.example.miniprojeto.domain.usecase.GetAllReadingsUseCase
@@ -9,12 +10,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * ViewModel para a tela de histórico.
  *
  * Gerencia o carregamento e limpeza de leituras salvas.
+ * Todas as operações de banco rodam em coroutines (IO thread).
  */
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
@@ -31,25 +34,43 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun loadReadings() {
-        val readings = getAllReadingsUseCase()
-        _uiState.update {
-            it.copy(
-                readings = readings,
-                isEmpty = readings.isEmpty()
-            )
+        viewModelScope.launch {
+            val readings = getAllReadingsUseCase()
+            _uiState.update {
+                it.copy(
+                    readings = readings,
+                    isEmpty = readings.isEmpty()
+                )
+            }
         }
     }
 
     fun clearHistory() {
-        clearAllReadingsUseCase()
-        loadReadings()
-        _uiState.update { it.copy(clearMessage = "Histórico limpo!") }
+        viewModelScope.launch {
+            clearAllReadingsUseCase()
+            val readings = getAllReadingsUseCase()
+            _uiState.update {
+                it.copy(
+                    readings = readings,
+                    isEmpty = readings.isEmpty(),
+                    clearMessage = "Histórico limpo!"
+                )
+            }
+        }
     }
 
     fun deleteReading(id: Long) {
-        deleteReadingUseCase(id)
-        loadReadings()
-        _uiState.update { it.copy(clearMessage = "Leitura removida!") }
+        viewModelScope.launch {
+            deleteReadingUseCase(id)
+            val readings = getAllReadingsUseCase()
+            _uiState.update {
+                it.copy(
+                    readings = readings,
+                    isEmpty = readings.isEmpty(),
+                    clearMessage = "Leitura removida!"
+                )
+            }
+        }
     }
 
     fun clearMessage() {

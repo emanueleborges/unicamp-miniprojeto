@@ -9,7 +9,7 @@ import javax.inject.Inject
 class SaveAccelerometerReadingUseCase @Inject constructor(
     private val repository: SensorRepositoryInterface
 ) {
-    operator fun invoke(x: Float, y: Float, z: Float): Long {
+    suspend operator fun invoke(x: Float, y: Float, z: Float): Long {
         return repository.saveAccelerometerReading(x, y, z)
     }
 }

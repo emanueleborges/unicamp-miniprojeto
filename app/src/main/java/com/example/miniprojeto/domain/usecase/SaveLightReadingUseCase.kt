@@ -9,7 +9,7 @@ import javax.inject.Inject
 class SaveLightReadingUseCase @Inject constructor(
     private val repository: SensorRepositoryInterface
 ) {
-    operator fun invoke(lux: Float): Long {
+    suspend operator fun invoke(lux: Float): Long {
         return repository.saveLightReading(lux)
     }
 }

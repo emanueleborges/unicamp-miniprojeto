@@ -3,6 +3,7 @@ package com.example.miniprojeto.presentation.screen.light
 import androidx.compose.ui.graphics.Color
 import android.hardware.SensorEvent
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.miniprojeto.domain.usecase.SaveLightReadingUseCase
 import com.example.miniprojeto.sensor.LightSensorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -50,9 +52,11 @@ class LightSensorViewModel @Inject constructor(
     }
 
     fun saveReading() {
-        val state = _uiState.value
-        val id = saveLightReadingUseCase(state.lux)
-        _uiState.update { it.copy(saveMessage = "Leitura salva (ID: $id)!") }
+        viewModelScope.launch {
+            val state = _uiState.value
+            val id = saveLightReadingUseCase(state.lux)
+            _uiState.update { it.copy(saveMessage = "Leitura salva (ID: $id)!") }
+        }
     }
 
     fun clearSaveMessage() {

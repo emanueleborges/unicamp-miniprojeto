@@ -52,6 +52,7 @@ O **SensorMonitor** utiliza sensores reais do dispositivo Android (acelerômetro
 - Lista todas as leituras salvas usando `LazyColumn`
 - Indicador colorido por tipo de sensor
 - Exibe valores e data/hora de cada registro
+- Botão de **lixeira** em cada item para **deletar individualmente**
 - Botão para **limpar todo o histórico**
 - Estado gerenciado via `HistoryViewModel` + `StateFlow`
 
@@ -74,6 +75,7 @@ com.example.miniprojeto/
 │       ├── SaveAccelerometerReadingUseCase.kt
 │       ├── SaveLightReadingUseCase.kt
 │       ├── GetAllReadingsUseCase.kt
+│       ├── DeleteReadingUseCase.kt
 │       └── ClearAllReadingsUseCase.kt
 ├── presentation/                     ← CAMADA DE APRESENTAÇÃO
 │   ├── components/CommonComponents.kt      (Composables reutilizáveis)
@@ -123,6 +125,173 @@ com.example.miniprojeto/
 [Screen Composable] → renderiza a UI
 
 [Salvar] → ViewModel → UseCase → Repository → SQLiteHelper
+```
+
+---
+
+## 🗺️ Mapa de Interligações — O que cada arquivo faz e com quem se conecta
+
+### Legenda
+```
+A ──▶ B   →  A depende de / usa B
+A ◀──▶ B  →  Relação bidirecional
+```
+
+### Visão Geral das Conexões
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        ANDROID SYSTEM                               │
+│  AndroidManifest.xml → registra MainActivity + SensorMonitorApp     │
+│  Sensor Hardware → fornece dados via SensorManager                  │
+└──────────────┬──────────────────────────────────────────────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│     SensorMonitorApp.kt     │  Ponto de entrada do Hilt (@HiltAndroidApp)
+│     Inicializa Dagger/Hilt  │──▶ AppModule.kt (provisão de dependências)
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│     MainActivity.kt         │  Única Activity do app (@AndroidEntryPoint)
+│     Configura Compose +     │──▶ MiniProjetoTheme (Theme.kt)
+│     edge-to-edge            │──▶ AppNavGraph.kt (define rotas)
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                     AppNavGraph.kt                                   │
+│  Controlador central de navegação (NavHost + NavController)          │
+│                                                                      │
+│  Screen.kt (rotas seladas) define:                                   │
+│    "main"           ──▶  MainScreen.kt                               │
+│    "accelerometer"  ──▶  AccelerometerScreen.kt                      │
+│    "light"          ──▶  LightSensorScreen.kt                        │
+│    "history"        ──▶  HistoryScreen.kt                            │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### Detalhamento por Arquivo
+
+#### 🏠 Tela Principal
+```
+MainScreen.kt
+├── Usa: SensorTopBar, StatusBadge (CommonComponents.kt)
+├── Usa: Cores do tema (Color.kt)
+└── Emite callbacks de navegação → AppNavGraph.kt decide a rota
+```
+
+#### 🏃 Fluxo do Acelerômetro
+```
+AccelerometerScreen.kt (UI Compose)
+├── Cria: SensorEventListener via DisposableEffect
+│         └── Registra sensor TYPE_ACCELEROMETER no SensorManager do Android
+├── Cria: AccelerometerHandler.kt ──▶ processa evento → retorna AccelerometerData
+├── Cria: ShakeDetector.kt
+│         ├── Usa: Constants.kt (SHAKE_THRESHOLD, SHAKE_COOLDOWN_MS)
+│         └── Usa: VibrationHelper.kt → vibra o dispositivo
+├── Observa: AccelerometerViewModel.kt via hiltViewModel()
+│         ├── Atualiza: AccelerometerUiState.kt (x, y, z, magnitude, isMoving...)
+│         ├── Usa: SaveAccelerometerReadingUseCase.kt
+│         │         └──▶ SensorRepositoryInterface.kt (contrato)
+│         │              └──▶ SensorRepository.kt (implementação)
+│         │                   ├── Usa: DateFormatter.kt (timestamp)
+│         │                   └──▶ SensorDatabaseHelper.kt → INSERT no SQLite
+│         └── Usa: Extensions.kt (toProgress)
+├── Usa: SensorTopBar, StatusBadge (CommonComponents.kt)
+└── Usa: Cores do tema (Color.kt)
+```
+
+#### 💡 Fluxo do Sensor de Luz
+```
+LightSensorScreen.kt (UI Compose)
+├── Cria: SensorEventListener via DisposableEffect
+│         └── Registra sensor TYPE_LIGHT no SensorManager do Android
+├── Cria: LightSensorHandler.kt ──▶ processa evento → retorna LightData
+│         └── Calcula: descrição do ambiente + cor de fundo + progresso
+├── Observa: LightSensorViewModel.kt via hiltViewModel()
+│         ├── Atualiza: LightSensorUiState.kt (lux, description, backgroundColor...)
+│         ├── Usa: SaveLightReadingUseCase.kt
+│         │         └──▶ SensorRepositoryInterface.kt → SensorRepository.kt
+│         │              ├── Usa: DateFormatter.kt
+│         │              └──▶ SensorDatabaseHelper.kt → INSERT no SQLite
+│         └── Usa: Constants.kt (SENSOR_TYPE_LIGHT)
+├── Usa: SensorTopBar, StatusBadge (CommonComponents.kt)
+└── Usa: Cores do tema (Color.kt)
+```
+
+#### 📜 Fluxo do Histórico
+```
+HistoryScreen.kt (UI Compose)
+├── Observa: HistoryViewModel.kt via hiltViewModel()
+│         ├── Atualiza: HistoryUiState.kt (readings, isEmpty, clearMessage)
+│         ├── Usa: GetAllReadingsUseCase.kt ──▶ Repository → DB → SELECT
+│         ├── Usa: DeleteReadingUseCase.kt  ──▶ Repository → DB → DELETE por ID
+│         └── Usa: ClearAllReadingsUseCase.kt ──▶ Repository → DB → DELETE tudo
+├── Renderiza: ReadingListItem (CommonComponents.kt) com LazyColumn
+│         └── Exibe: SensorReading.kt (id, sensorType, valueX/Y/Z, timestamp)
+├── Usa: SensorTopBar (CommonComponents.kt)
+└── Usa: Cores do tema (Color.kt)
+```
+
+#### 💉 Injeção de Dependência (Hilt)
+```
+AppModule.kt (@Module @InstallIn SingletonComponent)
+├── Provê: SensorDatabaseHelper (Singleton) ← recebe Context
+├── Provê: SensorRepositoryInterface ← SensorRepository(dbHelper)
+├── Provê: SaveAccelerometerReadingUseCase ← recebe Repository
+├── Provê: SaveLightReadingUseCase ← recebe Repository
+├── Provê: GetAllReadingsUseCase ← recebe Repository
+└── Provê: ClearAllReadingsUseCase ← recebe Repository
+
+Os ViewModels recebem UseCases via @Inject constructor (auto-providos pelo Hilt)
+```
+
+#### 🗄️ Camada de Dados (Banco SQLite)
+```
+SensorDatabaseHelper.kt (SQLiteOpenHelper)
+├── Banco: sensor_data.db (versão 1)
+├── Tabela: readings
+│   ├── id            INTEGER PRIMARY KEY AUTOINCREMENT
+│   ├── sensor_type   TEXT NOT NULL ("accelerometer" | "light")
+│   ├── value_x       REAL NOT NULL
+│   ├── value_y       REAL NOT NULL
+│   ├── value_z       REAL NOT NULL
+│   └── timestamp     TEXT NOT NULL ("yyyy-MM-dd HH:mm:ss")
+├── insertReading()       → usado por SensorRepository
+├── getAllReadings()       → usado por SensorRepository
+├── deleteReadingById()   → usado por SensorRepository
+└── clearAllReadings()    → usado por SensorRepository
+```
+
+#### 🔧 Utilitários
+```
+Constants.kt
+├── TAG ("SensorMonitor") → usado em logs por todo o projeto
+├── MOVEMENT_THRESHOLD    → usado por AccelerometerHandler
+├── SHAKE_THRESHOLD       → usado por ShakeDetector
+├── SHAKE_COOLDOWN_MS     → usado por ShakeDetector
+├── LIGHT_PROGRESS_MAX    → usado por LightSensorHandler
+├── SENSOR_TYPE_*         → usado por Repository + CommonComponents
+└── ACCEL_PROGRESS_MAX    → usado por Extensions.kt
+
+DateFormatter.kt
+└── currentTimestamp() → usado por SensorRepository ao salvar leituras
+
+VibrationHelper.kt
+└── vibrate(context) → usado por ShakeDetector ao detectar agitação
+
+Extensions.kt
+└── Float.toProgress() → usado por AccelerometerViewModel para barras de progresso
+```
+
+#### 🎨 Tema
+```
+Color.kt   → Define paleta de cores (Background, Card, Primary, Danger, etc.)
+Theme.kt   → Configura Material3 dark theme usando as cores
+Type.kt    → Define tipografia padrão
+           → Todos usados por todas as Screens e Components
 ```
 
 ---

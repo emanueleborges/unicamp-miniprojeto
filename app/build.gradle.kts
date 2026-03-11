@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    jacoco
 }
 
 android {
@@ -46,6 +47,77 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco"))
+    }
+
+    val jacocoExcludes = listOf(
+        // Android generated
+        "**/R.class", "**/R\$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        // Hilt / DI generated
+        "**/*_Hilt*.*", "**/Hilt_*.*",
+        "**/*_Factory.*", "**/*_MembersInjector.*",
+        "**/*Module.*", "**/*Module\$*.*",
+        "**/*Directions*.*", "**/*Args*.*",
+        "**/*_GeneratedInjector*.*",
+        "**/*_ComponentTreeDeps*.*",
+        "**/di/**",
+        "**/dagger/**",
+        "**/hilt_aggregated_deps/**",
+        // Compose generated singletons
+        "**/ComposableSingletons*.*",
+        // UI / Compose (não testável em unit test)
+        "**/ui/theme/**",
+        "**/ui/main/**",
+        "**/SensorMonitorApp.*",
+        "**/presentation/screen/main/**",
+        "**/presentation/screen/accelerometer/AccelerometerScreen*",
+        "**/presentation/screen/light/LightSensorScreen*",
+        "**/presentation/screen/history/HistoryScreen*",
+        "**/presentation/components/**",
+        "**/presentation/navigation/**",
+        // Android-dependent (SQLite, Context, SensorEvent)
+        "**/data/database/**",
+        "**/data/repository/**",
+        "**/sensor/BaseSensorHandler*",
+        "**/sensor/ShakeDetector*",
+        "**/sensor/AccelerometerHandler.class",
+        "**/sensor/LightSensorHandler.class",
+        "**/util/VibrationHelper*",
+        "**/presentation/screen/accelerometer/AccelerometerViewModel*"
+    )
+
+    val kotlinClasses = fileTree(layout.buildDirectory.dir("intermediates/classes/debug")) {
+        exclude(jacocoExcludes)
+    }
+
+    val kotlinCompiledClasses = fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+        exclude(jacocoExcludes)
+    }
+
+    classDirectories.setFrom(kotlinClasses + kotlinCompiledClasses)
+
+    sourceDirectories.setFrom(
+        files("src/main/java")
+    )
+
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include("jacoco/testDebugUnitTest.exec")
+        }
+    )
 }
 
 dependencies {
@@ -72,6 +144,8 @@ dependencies {
 
     // Test
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

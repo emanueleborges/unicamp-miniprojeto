@@ -47,5 +47,10 @@ object AppModule {
     fun provideClearAllReadingsUseCase(
         repository: SensorRepositoryInterface
     ) = ClearAllReadingsUseCase(repository)
+
+    @Provides
+    fun provideDeleteReadingUseCase(
+        repository: SensorRepositoryInterface
+    ) = DeleteReadingUseCase(repository)
 }
 

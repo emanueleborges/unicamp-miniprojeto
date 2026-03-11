@@ -96,9 +96,11 @@ class AccelerometerViewModel @Inject constructor(
     }
 
     fun saveReading() {
-        val state = _uiState.value
-        val id = saveAccelerometerReadingUseCase(state.x, state.y, state.z)
-        _uiState.update { it.copy(saveMessage = "Leitura salva (ID: $id)!") }
+        viewModelScope.launch {
+            val state = _uiState.value
+            val id = saveAccelerometerReadingUseCase(state.x, state.y, state.z)
+            _uiState.update { it.copy(saveMessage = "Leitura salva (ID: $id)!") }
+        }
     }
 
     fun clearSaveMessage() {

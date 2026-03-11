@@ -9,7 +9,7 @@ import javax.inject.Inject
 class DeleteReadingUseCase @Inject constructor(
     private val repository: SensorRepositoryInterface
 ) {
-    operator fun invoke(id: Long) {
+    suspend operator fun invoke(id: Long) {
         repository.deleteById(id)
     }
 }

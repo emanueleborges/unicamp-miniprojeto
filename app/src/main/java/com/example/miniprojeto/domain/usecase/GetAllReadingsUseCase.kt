@@ -10,7 +10,7 @@ import javax.inject.Inject
 class GetAllReadingsUseCase @Inject constructor(
     private val repository: SensorRepositoryInterface
 ) {
-    operator fun invoke(): List<SensorReading> {
+    suspend operator fun invoke(): List<SensorReading> {
         return repository.getAllReadings()
     }
 }

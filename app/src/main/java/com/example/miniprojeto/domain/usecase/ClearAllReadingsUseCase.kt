@@ -9,7 +9,7 @@ import javax.inject.Inject
 class ClearAllReadingsUseCase @Inject constructor(
     private val repository: SensorRepositoryInterface
 ) {
-    operator fun invoke() {
+    suspend operator fun invoke() {
         repository.clearAll()
     }
 }

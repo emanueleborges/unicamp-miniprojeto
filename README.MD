@@ -339,7 +339,7 @@ Para filtrar no Logcat:
 tag:SensorMonitor
 ```
 
----
+---<img src="teste_unitario.png" alt="Foto de Emanuel Borges" style="width: 200px; border-radius: 100px;">
 
 ## 👤 Autor
 

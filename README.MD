@@ -340,7 +340,7 @@ tag:SensorMonitor
 ```
 ## 📝 Tesde de Cobertura 
 
-<img src="sensortela.png">
+<img src="sensortela.png" widht="200px" height="600px">
 
 
 ## 📝 Tesde de Cobertura 

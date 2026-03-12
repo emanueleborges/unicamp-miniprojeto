@@ -338,7 +338,7 @@ Para filtrar no Logcat:
 ```
 tag:SensorMonitor
 ```
-## 📝 Tesde de Cobertura 
+## 📝 Tela Principal 
 
 <img src="sensortela.png" widht="200px" height="600px">
 

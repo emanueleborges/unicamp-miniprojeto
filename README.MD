@@ -343,7 +343,7 @@ tag:SensorMonitor
 <img src="sensortela.png" widht="200px" height="600px">
 
 
-## 📝 Tesde de Cobertura 
+## 📝 Teste de Cobertura 
 
 <img src="testecobertura.png">
 

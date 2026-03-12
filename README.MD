@@ -340,6 +340,11 @@ tag:SensorMonitor
 ```
 ## 📝 Tesde de Cobertura 
 
+<img src="sensortela.png">
+
+
+## 📝 Tesde de Cobertura 
+
 <img src="testecobertura.png">
 
 ## 👤 Autor

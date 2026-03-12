@@ -6,6 +6,11 @@ plugins {
     jacoco
 }
 
+// Configuração de Java Toolchain FORA do bloco android
+kotlin {
+    jvmToolchain(21)
+}
+
 android {
     namespace = "com.example.miniprojeto"
     compileSdk = 36

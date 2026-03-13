@@ -11,17 +11,18 @@ O **SensorMonitor** utiliza sensores reais do dispositivo Android (acelerômetro
 ---
 
 ## ✅ Requisitos Atendidos
-
-| Requisito | Implementação |
-|---|---|
-| Sensor real | Acelerômetro (`TYPE_ACCELEROMETER`) e Sensor de Luz (`TYPE_LIGHT`) |
-| Interface interativa | 4 telas Compose com interação do usuário |
-| UI declarativa | Jetpack Compose com Material3 e tema dark personalizado |
-| Navegação | Compose Navigation (`NavHost`) — Single-Activity |
-| Exibição em tempo real | `SensorEventListener` com atualização contínua via `StateFlow` |
-| Banco de dados | Room (Jetpack ORM) com `@Entity`, `@Dao`, `@Database` e Coroutines |
-| Arquitetura | MVVM + Clean Architecture com camadas `data → domain → presentation` |
-| Injeção de dependência | Hilt (`@HiltViewModel`, `@Inject`, `@Module`) |
+|-----------------------------|-----------------------------------------------------------------------|
+| Requisito                   | Implementação                                                         |
+|-----------------------------|-----------------------------------------------------------------------|
+| Sensor real                 | Acelerômetro (`TYPE_ACCELEROMETER`) e Sensor de Luz (`TYPE_LIGHT`)    |
+| Interface interativa        | 4 telas Compose com interação do usuário                              |
+| UI declarativa              | Jetpack Compose com Material3 e tema dark personalizado               |
+| Navegação                   | Compose Navigation (`NavHost`) — Single-Activity                      |
+| Exibição em tempo real      | `SensorEventListener` com atualização contínua via `StateFlow`        |
+| Banco de dados              | Room (Jetpack ORM) com `@Entity`, `@Dao`, `@Database` e Coroutines    |
+| Arquitetura                 | MVVM + Clean Architecture com camadas `data → domain → presentation`  |
+| Injeção de dependência      | Hilt (`@HiltViewModel`, `@Inject`, `@Module`)                         |
+|-----------------------------|-----------------------------------------------------------------------|
 
 ---
 
@@ -131,14 +132,26 @@ com.example.miniprojeto/
 
 ### 🧅 Diagrama de Camadas — Clean Architecture
 
+<img src="clean-arquiteture.png">
+
 O projeto segue fielmente o **Diagrama de Camadas da Arquitetura Limpa (Clean Architecture)** de Robert C. Martin:
 
 | Camada (Diagrama) | Descrição | Mapeamento no Projeto |
-|---|---|---|
-| **Entidades** (centro — amarelo) | Regras de Negócio da Empresa | `data/model/SensorReading.kt` (`@Entity` Room) |
-| **Casos de Uso** (rosa) | Regras de Negócio da Aplicação | `domain/usecase/` — `SaveAccelerometerReadingUseCase`, `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`, `ClearAllReadingsUseCase` |
-| **Adaptadores de Interface** (verde) | Controladores, Apresentadores, Gateways | **Gateway:** `SensorRepositoryInterface` · **Controladores/Apresentadores:** ViewModels (`AccelerometerViewModel`, `LightSensorViewModel`, `HistoryViewModel`) · **Implementação:** `SensorRepository` |
-| **Frameworks & Drivers** (azul — externo) | DB, UI, Web, Dispositivos | **DB:** `SensorDatabase` + `SensorDao` (Room) · **UI:** Jetpack Compose Screens + `MainActivity` · **Dispositivos:** `SensorManager`, `AccelerometerHandler`, `LightSensorHandler` |
+|------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------|
+| **Entidades** (centro — amarelo)         | Regras de Negócio da Empresa            | `data/model/SensorReading.kt` (`@Entity` Room)                                   |
+|------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------|
+| **Casos de Uso** (rosa)                  | Regras de Negócio da Aplicação          | `domain/usecase/` — `SaveAccelerometerReadingUseCase`, `ClearAllReadingsUseCase` |
+|                                          |                                         | `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`       |    
+|------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------|
+| **Adaptadores de Interface** (verde)     | Controladores, Apresentadores, Gateways | **Gateway:** `SensorRepositoryInterface` ·                                       |  
+|                                          |                                         | **Controladores/Apresentadores:** ViewModels (`AccelerometerViewModel`,          |
+|                                          |                                         | `LightSensorViewModel`, `HistoryViewModel`)                                      | 
+|                                          |                                         | **Implementação:** `SensorRepository`                                            |
+|------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------|
+| **Frameworks & Drivers** (azul — externo)| DB, UI, Web, Dispositivos               | **DB:** `SensorDatabase` + `SensorDao` (Room)                                    | 
+|                                          |                                         | **UI:** Jetpack Compose Screens + `MainActivity`                                 | 
+|                                          |                                         | **Dispositivos:** `SensorManager`, `AccelerometerHandler`, `LightSensorHandler`  |
+|------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------|
 
 #### Regra de Dependência
 

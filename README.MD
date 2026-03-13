@@ -138,7 +138,7 @@ O projeto segue fielmente o **Diagrama de Camadas da Arquitetura Limpa (Clean Ar
 |------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------|
 | **Entidades** (centro — amarelo)         | Regras de Negócio da Empresa            | `data/model/SensorReading.kt` (`@Entity` Room)                                   |
 | **Casos de Uso** (rosa)                  | Regras de Negócio da Aplicação          | `domain/usecase/` — `SaveAccelerometerReadingUseCase`, `ClearAllReadingsUseCase` |
-|                                          |                                         | `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`       |    
+                                                                                     | `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`       |    
 | **Adaptadores de Interface** (verde)     | Controladores, Apresentadores, Gateways | **Gateway:** `SensorRepositoryInterface` ·                                       |  
 |                                                                                    | **Controladores/Apresentadores:** ViewModels (`AccelerometerViewModel`,          |
 |                                                                                    | `LightSensorViewModel`, `HistoryViewModel`)                                      | 

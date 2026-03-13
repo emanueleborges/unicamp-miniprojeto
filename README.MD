@@ -134,12 +134,12 @@ com.example.miniprojeto/
 
 O projeto segue fielmente o **Diagrama de Camadas da Arquitetura Limpa (Clean Architecture)** de Robert C. Martin:
 
-| Camada (Diagrama) | Descrição | Mapeamento no Projeto |
-|---|---|---|
-| **Entidades** (centro — amarelo) | Regras de Negócio da Empresa | `data/model/SensorReading.kt` (`@Entity` Room) |
-| **Casos de Uso** (rosa) | Regras de Negócio da Aplicação | `domain/usecase/` — `SaveAccelerometerReadingUseCase`, `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`, `ClearAllReadingsUseCase` |
-| **Adaptadores de Interface** (verde) | Controladores, Apresentadores, Gateways | **Gateway:** `SensorRepositoryInterface` · **Controladores/Apresentadores:** ViewModels (`AccelerometerViewModel`, `LightSensorViewModel`, `HistoryViewModel`) · **Implementação:** `SensorRepository` |
-| **Frameworks & Drivers** (azul — externo) | DB, UI, Web, Dispositivos | **DB:** `SensorDatabase` + `SensorDao` (Room) · **UI:** Jetpack Compose Screens + `MainActivity` · **Dispositivos:** `SensorManager`, `AccelerometerHandler`, `LightSensorHandler` |
+| Camada (Diagrama) | Cor | Pacote no Projeto | Arquivos |
+|---|---|---|---|
+| Entidades | Amarela | `data/model/` | `SensorReading.kt` (`@Entity` Room) |
+| Casos de Uso | Rosa | `domain/usecase/` | `SaveAccelerometerReadingUseCase`, `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`, `ClearAllReadingsUseCase` |
+| Adaptadores de Interface | Verde | `domain/repository/` + `presentation/` + `data/repository/` | `SensorRepositoryInterface` (Gateway), `SensorRepository` (Implementação), ViewModels (Controladores/Apresentadores) |
+| Frameworks & Drivers | Azul | `data/database/` + `ui/` + `sensor/` | `SensorDatabase` + `SensorDao` (DB), `MainActivity` (UI), Compose Screens (UI), `SensorManager` (Dispositivos) |
 
 #### Regra de Dependência
 

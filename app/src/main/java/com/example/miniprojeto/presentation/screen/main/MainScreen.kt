@@ -35,18 +35,18 @@ fun MainScreen(
         // ── HEADER ──
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 20.dp)
+            modifier = Modifier.padding(bottom = 18.dp)
         ) {
             Surface(
                 shape = CircleShape,
                 color = ColorPrimaryDark,
-                modifier = Modifier.size(44.dp)
+                modifier = Modifier.size(40.dp)
             ) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text("📊", fontSize = 22.sp)
+                    Text("📊", fontSize = 18.sp)
                 }
             }
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Column {
                 Text(
                     text = "Sensor Monitor",
@@ -74,17 +74,17 @@ fun MainScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(140.dp)
+                        .height(80.dp)
                         .background(ColorPrimaryDark),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("⚡🔧💻", fontSize = 32.sp)
+                        Text("⚡🔧💻", fontSize = 24.sp)
                         Text(
                             text = "Hardware Monitor",
                             fontSize = 14.sp,
-                            color = ColorText.copy(alpha = 0.6f),
-                            modifier = Modifier.padding(top = 4.dp)
+                            color = ColorText.copy(alpha = 0.9f),
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }
@@ -92,7 +92,7 @@ fun MainScreen(
                 Column(modifier = Modifier.padding(20.dp)) {
                     Text(
                         text = "Painel de Controle",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorText
                     )
@@ -100,27 +100,21 @@ fun MainScreen(
                         text = "Visualize e gerencie todos os dados de hardware do seu dispositivo Android em um só lugar.",
                         fontSize = 14.sp,
                         color = ColorTextSecondary,
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally),
                         lineHeight = 20.sp
                     )
 
-                    Row(
-                        modifier = Modifier.padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        StatusBadge("Sistema Ativo", ColorBadgeActive, ColorBadgeActiveText)
-                        StatusBadge("SQLite Conectado", ColorBadgePrimary, ColorBadgePrimaryText)
-                    }
+
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // ── SECTION TITLE ──
         Text(
             text = "Sensores Disponíveis",
-            fontSize = 20.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = ColorText,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -136,7 +130,6 @@ fun MainScreen(
             badgeText = "Em Espera",
             badgeBg = ColorAccelerometerDark,
             badgeTextColor = ColorAccelerometer,
-            features = listOf("Eixos X, Y, Z", "Magnitude", "Detector de Shake"),
             onClick = onNavigateToAccelerometer
         )
 
@@ -151,7 +144,6 @@ fun MainScreen(
             badgeText = "Em Espera",
             badgeBg = ColorLightDark,
             badgeTextColor = ColorLight,
-            features = listOf("Lux em tempo real", "Tipo de ambiente", "Cor adaptativa"),
             onClick = onNavigateToLight
         )
 
@@ -166,7 +158,6 @@ fun MainScreen(
             badgeText = "SQLite",
             badgeBg = ColorHistoryDark,
             badgeTextColor = ColorHistory,
-            features = listOf("Todas as leituras", "Filtro por tipo", "Limpar dados"),
             onClick = onNavigateToHistory
         )
 
@@ -184,7 +175,6 @@ private fun SensorMenuCard(
     badgeText: String,
     badgeBg: androidx.compose.ui.graphics.Color,
     badgeTextColor: androidx.compose.ui.graphics.Color,
-    features: List<String>,
     onClick: () -> Unit
 ) {
     Card(
@@ -240,27 +230,7 @@ private fun SensorMenuCard(
                 lineHeight = 20.sp
             )
 
-            // Features
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                features.forEach { feature ->
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = ColorCardBorder,
-                    ) {
-                        Text(
-                            text = feature,
-                            fontSize = 11.sp,
-                            color = ColorTextSecondary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
-                }
-            }
+
 
             // Botão abrir
             Box(
@@ -271,7 +241,7 @@ private fun SensorMenuCard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Abrir Monitor →",
+                    text = "Abrir Monitor",
                     color = accentColor,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,

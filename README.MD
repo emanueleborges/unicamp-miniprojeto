@@ -6,7 +6,7 @@ Aplicativo Android para monitoramento de sensores em tempo real, desenvolvido co
 
 ## 📋 Sobre o Projeto
 
-O **SensorMonitor** utiliza sensores reais do dispositivo Android (acelerômetro e sensor de luz) para capturar, exibir e armazenar dados sensoriais. O app segue a arquitetura **MVVM + Clean Architecture** com **Jetpack Compose** para UI, **Hilt** para injeção de dependência e persistência com **SQLite**.
+O **SensorMonitor** utiliza sensores reais do dispositivo Android (acelerômetro e sensor de luz) para capturar, exibir e armazenar dados sensoriais. O app segue a arquitetura **MVVM + Clean Architecture** com **Jetpack Compose** para UI, **Hilt** para injeção de dependência e persistência com **Room** (Jetpack ORM sobre SQLite).
 
 ---
 
@@ -19,7 +19,7 @@ O **SensorMonitor** utiliza sensores reais do dispositivo Android (acelerômetro
 | UI declarativa | Jetpack Compose com Material3 e tema dark personalizado |
 | Navegação | Compose Navigation (`NavHost`) — Single-Activity |
 | Exibição em tempo real | `SensorEventListener` com atualização contínua via `StateFlow` |
-| Banco de dados SQLite | `SQLiteOpenHelper` com operações de inserção, consulta e exclusão |
+| Banco de dados | Room (Jetpack ORM) com `@Entity`, `@Dao`, `@Database` e Coroutines |
 | Arquitetura | MVVM + Clean Architecture com camadas `data → domain → presentation` |
 | Injeção de dependência | Hilt (`@HiltViewModel`, `@Inject`, `@Module`) |
 
@@ -64,8 +64,10 @@ O **SensorMonitor** utiliza sensores reais do dispositivo Android (acelerômetro
 com.example.miniprojeto/
 ├── SensorMonitorApp.kt              ← @HiltAndroidApp
 ├── data/                             ← CAMADA DE DADOS
-│   ├── database/SensorDatabaseHelper.kt    (SQLite)
-│   ├── model/SensorReading.kt              (Data class)
+│   ├── database/
+│   │   ├── SensorDatabase.kt               (Room @Database)
+│   │   └── SensorDao.kt                    (Room @Dao)
+│   ├── model/SensorReading.kt              (Room @Entity)
 │   └── repository/SensorRepository.kt      (Implementação)
 ├── di/                               ← INJEÇÃO DE DEPENDÊNCIA
 │   └── AppModule.kt                        (Hilt Module)
@@ -124,8 +126,40 @@ com.example.miniprojeto/
       ↓
 [Screen Composable] → renderiza a UI
 
-[Salvar] → ViewModel → UseCase → Repository → SQLiteHelper
+[Salvar] → ViewModel → UseCase → Repository → Room (SensorDao)
 ```
+
+### 🧅 Diagrama de Camadas — Clean Architecture
+
+O projeto segue fielmente o **Diagrama de Camadas da Arquitetura Limpa (Clean Architecture)** de Robert C. Martin:
+
+| Camada (Diagrama) | Descrição | Mapeamento no Projeto |
+|---|---|---|
+| **Entidades** (centro — amarelo) | Regras de Negócio da Empresa | `data/model/SensorReading.kt` (`@Entity` Room) |
+| **Casos de Uso** (rosa) | Regras de Negócio da Aplicação | `domain/usecase/` — `SaveAccelerometerReadingUseCase`, `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`, `ClearAllReadingsUseCase` |
+| **Adaptadores de Interface** (verde) | Controladores, Apresentadores, Gateways | **Gateway:** `SensorRepositoryInterface` · **Controladores/Apresentadores:** ViewModels (`AccelerometerViewModel`, `LightSensorViewModel`, `HistoryViewModel`) · **Implementação:** `SensorRepository` |
+| **Frameworks & Drivers** (azul — externo) | DB, UI, Web, Dispositivos | **DB:** `SensorDatabase` + `SensorDao` (Room) · **UI:** Jetpack Compose Screens + `MainActivity` · **Dispositivos:** `SensorManager`, `AccelerometerHandler`, `LightSensorHandler` |
+
+#### Regra de Dependência
+
+As dependências só apontam **para dentro** (da camada externa para a interna):
+
+```
+Frameworks & Drivers (azul)
+  └── Compose Screens / Room / SensorManager
+        ↓
+Adaptadores de Interface (verde)
+  └── ViewModels → UseCases (nunca acessam o banco diretamente)
+  └── SensorRepository implementa SensorRepositoryInterface
+        ↓
+Casos de Uso (rosa)
+  └── Dependem apenas de SensorRepositoryInterface (contrato)
+        ↓
+Entidades (amarelo)
+  └── SensorReading — não depende de nenhuma outra camada
+```
+
+A inversão de dependência via `SensorRepositoryInterface` no pacote `domain/` é exatamente o **Gateway** do diagrama, garantindo que a camada de domínio nunca dependa de frameworks externos (Room, Android SDK).
 
 ---
 
@@ -197,7 +231,7 @@ AccelerometerScreen.kt (UI Compose)
 │         │         └──▶ SensorRepositoryInterface.kt (contrato)
 │         │              └──▶ SensorRepository.kt (implementação)
 │         │                   ├── Usa: DateFormatter.kt (timestamp)
-│         │                   └──▶ SensorDatabaseHelper.kt → INSERT no SQLite
+│         │                   └──▶ SensorDao.kt → INSERT via Room
 │         └── Usa: Extensions.kt (toProgress)
 ├── Usa: SensorTopBar, StatusBadge (CommonComponents.kt)
 └── Usa: Cores do tema (Color.kt)
@@ -215,7 +249,7 @@ LightSensorScreen.kt (UI Compose)
 │         ├── Usa: SaveLightReadingUseCase.kt
 │         │         └──▶ SensorRepositoryInterface.kt → SensorRepository.kt
 │         │              ├── Usa: DateFormatter.kt
-│         │              └──▶ SensorDatabaseHelper.kt → INSERT no SQLite
+│         │              └──▶ SensorDao.kt → INSERT via Room
 │         └── Usa: Constants.kt (SENSOR_TYPE_LIGHT)
 ├── Usa: SensorTopBar, StatusBadge (CommonComponents.kt)
 └── Usa: Cores do tema (Color.kt)
@@ -238,8 +272,9 @@ HistoryScreen.kt (UI Compose)
 #### 💉 Injeção de Dependência (Hilt)
 ```
 AppModule.kt (@Module @InstallIn SingletonComponent)
-├── Provê: SensorDatabaseHelper (Singleton) ← recebe Context
-├── Provê: SensorRepositoryInterface ← SensorRepository(dbHelper)
+├── Provê: SensorDatabase (Singleton via Room.databaseBuilder) ← recebe Context
+├── Provê: SensorDao ← database.sensorDao()
+├── Provê: SensorRepositoryInterface ← SensorRepository(sensorDao)
 ├── Provê: SaveAccelerometerReadingUseCase ← recebe Repository
 ├── Provê: SaveLightReadingUseCase ← recebe Repository
 ├── Provê: GetAllReadingsUseCase ← recebe Repository
@@ -248,21 +283,24 @@ AppModule.kt (@Module @InstallIn SingletonComponent)
 Os ViewModels recebem UseCases via @Inject constructor (auto-providos pelo Hilt)
 ```
 
-#### 🗄️ Camada de Dados (Banco SQLite)
+#### 🗄️ Camada de Dados (Room)
 ```
-SensorDatabaseHelper.kt (SQLiteOpenHelper)
+SensorDatabase.kt (@Database, RoomDatabase)
 ├── Banco: sensor_data.db (versão 1)
-├── Tabela: readings
-│   ├── id            INTEGER PRIMARY KEY AUTOINCREMENT
-│   ├── sensor_type   TEXT NOT NULL ("accelerometer" | "light")
-│   ├── value_x       REAL NOT NULL
-│   ├── value_y       REAL NOT NULL
-│   ├── value_z       REAL NOT NULL
-│   └── timestamp     TEXT NOT NULL ("yyyy-MM-dd HH:mm:ss")
-├── insertReading()       → usado por SensorRepository
-├── getAllReadings()       → usado por SensorRepository
-├── deleteReadingById()   → usado por SensorRepository
-└── clearAllReadings()    → usado por SensorRepository
+├── Entidade: SensorReading.kt (@Entity "readings")
+│   ├── id            Long @PrimaryKey(autoGenerate)
+│   ├── sensor_type   String @ColumnInfo
+│   ├── value_x       Float @ColumnInfo
+│   ├── value_y       Float @ColumnInfo
+│   ├── value_z       Float @ColumnInfo
+│   └── timestamp     String
+└── sensorDao()       → expõe SensorDao
+
+SensorDao.kt (@Dao)
+├── insertReading()       → @Insert, suspend
+├── getAllReadings()       → @Query, suspend, ORDER BY timestamp DESC
+├── deleteReadingById()   → @Query DELETE, suspend
+└── clearAllReadings()    → @Query DELETE ALL, suspend
 ```
 
 #### 🔧 Utilitários
@@ -306,7 +344,7 @@ Type.kt    → Define tipografia padrão
 - **Navegação:** Compose Navigation (`NavHost`)
 - **Estado:** `StateFlow` + `UiState` data classes
 - **DI:** Hilt (Dagger)
-- **Banco de Dados:** SQLite (via `SQLiteOpenHelper`)
+- **Banco de Dados:** Room (Jetpack ORM sobre SQLite) com `@Entity`, `@Dao`, `@Database`
 - **Sensores:** `SensorManager`, `SensorEventListener`
 - **Vibração:** `Vibrator` + `VibrationEffect`
 - **Build:** Gradle (Kotlin DSL) + AGP 9.x + KSP
@@ -318,11 +356,65 @@ Type.kt    → Define tipografia padrão
 1. Abra o projeto no **Android Studio**
 2. Conecte um dispositivo físico (recomendado para sensores reais)
 3. Execute o app com `Run > Run 'app'`
-4. Ou gere o APK via terminal:
-   ```bash
-   ./gradlew assembleDebug
-   ```
-   O APK será gerado em `app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+## 📦 Gerar APK via Terminal
+
+### APK de Debug
+
+```bash
+./gradlew assembleDebug
+```
+O APK será gerado em `app/build/outputs/apk/debug/app-debug.apk`
+
+### APK de Release (assinado)
+
+```bash
+./gradlew assembleRelease
+```
+O APK será gerado em `app/build/outputs/apk/release/app-release.apk`
+
+> O build de release aplica **minificação (R8/ProGuard)** e usa a signing config definida no projeto.
+
+### Limpar build anterior e gerar APK
+
+```bash
+./gradlew clean assembleDebug
+```
+
+```bash
+./gradlew clean assembleRelease
+```
+
+### Instalar APK diretamente no dispositivo conectado
+
+```bash
+./gradlew installDebug
+```
+
+```bash
+./gradlew installRelease
+```
+
+### Gerar APK de Debug e Release simultaneamente
+
+```bash
+./gradlew assemble
+```
+
+### Executar testes antes de gerar o APK
+
+```bash
+./gradlew testDebugUnitTest assembleDebug
+```
+
+### Gerar relatório de cobertura (JaCoCo) + APK
+
+```bash
+./gradlew jacocoTestReport assembleDebug
+```
+O relatório HTML será gerado em `app/build/reports/jacoco/`
 
 ---
 

@@ -1,7 +1,9 @@
 package com.example.miniprojeto.di
 
 import android.content.Context
-import com.example.miniprojeto.data.database.SensorDatabaseHelper
+import androidx.room.Room
+import com.example.miniprojeto.data.database.SensorDao
+import com.example.miniprojeto.data.database.SensorDatabase
 import com.example.miniprojeto.data.repository.SensorRepository
 import com.example.miniprojeto.domain.repository.SensorRepositoryInterface
 import com.example.miniprojeto.domain.usecase.*
@@ -18,15 +20,22 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSensorDatabaseHelper(
+    fun provideSensorDatabase(
         @ApplicationContext context: Context
-    ): SensorDatabaseHelper = SensorDatabaseHelper(context)
+    ): SensorDatabase = Room.databaseBuilder(
+        context,
+        SensorDatabase::class.java,
+        "sensor_data.db"
+    ).build()
+
+    @Provides
+    fun provideSensorDao(database: SensorDatabase): SensorDao = database.sensorDao()
 
     @Provides
     @Singleton
     fun provideSensorRepository(
-        dbHelper: SensorDatabaseHelper
-    ): SensorRepositoryInterface = SensorRepository(dbHelper)
+        sensorDao: SensorDao
+    ): SensorRepositoryInterface = SensorRepository(sensorDao)
 
     @Provides
     fun provideSaveAccelerometerReadingUseCase(

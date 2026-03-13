@@ -140,12 +140,12 @@ O projeto segue fielmente o **Diagrama de Camadas da Arquitetura Limpa (Clean Ar
 | **Casos de Uso** (rosa)                  | Regras de Negócio da Aplicação          | `domain/usecase/` — `SaveAccelerometerReadingUseCase`, `ClearAllReadingsUseCase` |
 |                                          |                                         | `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`       |    
 | **Adaptadores de Interface** (verde)     | Controladores, Apresentadores, Gateways | **Gateway:** `SensorRepositoryInterface` ·                                       |  
-|                                          |                                         | **Controladores/Apresentadores:** ViewModels (`AccelerometerViewModel`,          |
-|                                          |                                         | `LightSensorViewModel`, `HistoryViewModel`)                                      | 
-|                                          |                                         | **Implementação:** `SensorRepository`                                            |
+|                                                                                    | **Controladores/Apresentadores:** ViewModels (`AccelerometerViewModel`,          |
+|                                                                                    | `LightSensorViewModel`, `HistoryViewModel`)                                      | 
+|                                                                                    | **Implementação:** `SensorRepository`                                            |
 | **Frameworks & Drivers** (azul — externo)| DB, UI, Web, Dispositivos               | **DB:** `SensorDatabase` + `SensorDao` (Room)                                    | 
-|                                          |                                         | **UI:** Jetpack Compose Screens + `MainActivity`                                 | 
-|                                          |                                         | **Dispositivos:** `SensorManager`, `AccelerometerHandler`, `LightSensorHandler`  |
+|                                                                                    | **UI:** Jetpack Compose Screens + `MainActivity`                                 | 
+|                                                                                    | **Dispositivos:** `SensorManager`, `AccelerometerHandler`, `LightSensorHandler`  |
 
 #### Regra de Dependência
 

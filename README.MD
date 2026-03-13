@@ -21,7 +21,6 @@ O **SensorMonitor** utiliza sensores reais do dispositivo Android (acelerômetro
 | Banco de dados              | Room (Jetpack ORM) com `@Entity`, `@Dao`, `@Database` e Coroutines    |
 | Arquitetura                 | MVVM + Clean Architecture com camadas `data → domain → presentation`  |
 | Injeção de dependência      | Hilt (`@HiltViewModel`, `@Inject`, `@Module`)                         |
-|-----------------------------|-----------------------------------------------------------------------|
 
 ---
 
@@ -138,7 +137,6 @@ O projeto segue fielmente o **Diagrama de Camadas da Arquitetura Limpa (Clean Ar
 | Camada (Diagrama) | Descrição | Mapeamento no Projeto |
 |------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------|
 | **Entidades** (centro — amarelo)         | Regras de Negócio da Empresa            | `data/model/SensorReading.kt` (`@Entity` Room)                                   |
-|------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------|
 | **Casos de Uso** (rosa)                  | Regras de Negócio da Aplicação          | `domain/usecase/` — `SaveAccelerometerReadingUseCase`, `ClearAllReadingsUseCase` |
 |                                          |                                         | `SaveLightReadingUseCase`, `GetAllReadingsUseCase`, `DeleteReadingUseCase`       |    
 | **Adaptadores de Interface** (verde)     | Controladores, Apresentadores, Gateways | **Gateway:** `SensorRepositoryInterface` ·                                       |  
